@@ -1,0 +1,18 @@
+
+# Copyright 2023 Salesforce, Inc. All rights reserved.
+---
+apiVersion: gateway.mulesoft.com/v1alpha1
+kind: ApiInstance
+metadata:
+  name: open-ai-instance
+spec:
+  address: http://0.0.0.0:9095
+  services:
+    upstream:
+      address: http://backend_service:8080/
+  policies:
+    - policyRef:
+        name: native-external-proc-flex
+      config:
+        uri: "h2://transformation_server:8980"
+

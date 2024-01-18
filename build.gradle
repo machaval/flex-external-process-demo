@@ -1,0 +1,72 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'com.bmuschko.docker-java-application' version '9.4.0'
+}
+
+group = 'github.machaval.external_process_demo'
+version = '1.0-SNAPSHOT'
+mainClassName = 'github.machaval.transformation.grpc.Launcher'
+
+repositories {
+    mavenCentral()
+}
+
+docker {
+    javaApplication {
+        baseImage = 'openjdk:21'
+        maintainer = 'Mariano de Achaval'
+        ports = [8980, 8980]
+        jvmArgs = ['-Xms256m', '-Xmx2048m', '-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005']
+        images = ["external_proc_demo"]
+        mainClassName = 'github.machaval.transformation.grpc.Launcher'
+    }
+}
+
+dependencies {
+    implementation group: 'org.scala-lang', name: 'scala-library', version: scalaVersion
+    implementation 'org.mule.weave:runtime:2.6.0-SNAPSHOT'
+    implementation 'org.mule.weave:core-modules:2.6.0-SNAPSHOT'
+    implementation 'org.mule.weave:java-module:2.6.0-SNAPSHOT'
+
+    implementation group: 'io.envoyproxy.controlplane', name: 'api', version: '1.0.41'
+    implementation group: 'io.grpc', name: 'grpc-netty', version: '1.59.1'
+
+    implementation group: 'org.yaml', name: 'snakeyaml', version: '2.2'
+
+    if (JavaVersion.current().isJava9Compatible()) {
+        // Workaround for @javax.annotation.Generated
+        // see: https://github.com/grpc/grpc-java/issues/3633
+        implementation 'javax.annotation:javax.annotation-api:1.3.1'
+    }
+
+
+    testImplementation platform('org.junit:junit-bom:5.9.1')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+}
+
+java {
+    sourceCompatibility = "21"
+    targetCompatibility = "21"
+}
+
+repositories {
+    mavenCentral()
+    //Mule repositories
+    maven {
+        name "mule-releases"
+        url "https://repository-master.mulesoft.org/nexus/content/repositories/releases/"
+    }
+    maven {
+        name "mule-snapshots"
+        url "https://repository-master.mulesoft.org/nexus/content/repositories/snapshots/"
+    }
+    maven {
+        name "apache snapshots"
+        url "https://repository.apache.org/content/groups/snapshots"
+    }
+}
+
+test {
+    useJUnitPlatform()
+}

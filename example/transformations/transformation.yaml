@@ -1,0 +1,6 @@
+path: /data
+script:
+  | 
+    output application/json
+    ---
+    {hello: "world"}

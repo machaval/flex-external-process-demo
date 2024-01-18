@@ -1,0 +1,32 @@
+version: '3.7'
+services:
+  local-flex:
+    image: mulesoft/flex-gateway:1.6.0
+    networks:
+      - envoy
+    ports:
+      - "9095:9095"
+    volumes:
+      - ./config:/usr/local/share/mulesoft/flex-gateway/conf.d/
+  transformation_server:
+    image:  external_proc_demo:latest
+    environment:
+      - CONFIG_PATH=/transformations
+      - GRPC_PORT=8980
+    networks:
+      - envoy
+    ports:
+      - "8980:8980"
+      - "5005:5005"
+    volumes:
+      - "./transformations:/transformations"
+  backend_service:
+    image: solsson/http-echo
+    networks:
+      - envoy
+    environment:
+      - PORT=8080
+networks:
+  envoy:
+    name: envoy
+    driver: bridge
